@@ -2,6 +2,7 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
+from selenium.common.exceptions import NoSuchElementException, StaleElementReferenceException
 import time
 
 i = 0
@@ -45,7 +46,7 @@ while i < 10:
 	link = form.find_element_by_tag_name("a")
 	link.click()
 
-	register_link = driver.find_element_by_link_text("Register")
+	register_link = driver.find_element_by_id("nav").find_element_by_tag_name("a")
 	register_link.click()
 
 	username_input = driver.find_element_by_id("user_login")
@@ -61,10 +62,17 @@ while i < 10:
 
 	driver.switch_to.window(temp_mail_page)
 
-	link_for_like = WebDriverWait(driver, 20).until(
-	        EC.presence_of_element_located((By.CSS_SELECTOR, "li>a"))
-	    )
-	link_for_like.click()
+	temp = None
+	while temp is None:
+		try:
+			link_for_like = WebDriverWait(driver, 3).until(
+	        	EC.presence_of_element_located((By.CSS_SELECTOR, "li>a"))
+	    	)
+			link_for_like.click()
+			temp = True
+		except:
+			time.sleep(3)
+			driver.refresh()
 
 	go_back_voting_page = WebDriverWait(driver, 20).until(
 	        EC.presence_of_element_located((By.CSS_SELECTOR, "span>a"))
@@ -72,7 +80,7 @@ while i < 10:
 	go_back_voting_page.click()
 
 	# open document
-	document = WebDriverWait(driver, 120).until(
+	document = WebDriverWait(driver, 20).until(
 	        EC.presence_of_element_located((By.CLASS_NAME, "whitespace-pre-line"))
 	    )
 
@@ -130,7 +138,3 @@ while i < 10:
 	driver.execute_script('window.sessionStorage.clear();')
 
 	driver.quit()
-
-# staviti input - koliko lajkova zelis
-# staviti for petlju 
-# staviti try catch u slucaju greske da uradi continue
