@@ -6,7 +6,7 @@ from selenium.common.exceptions import NoSuchElementException, StaleElementRefer
 import time
 
 i = 0
-while i < 10:
+while i < 20:
 	i += 1
 	PATH = "C:\Program Files (x86)\chromedriver.exe"
 	driver = webdriver.Chrome(PATH)
@@ -23,8 +23,7 @@ while i < 10:
 		time.sleep(0.25)
 		random_mail = driver.find_element_by_id("address")
 
-	# print to check if it's successful
-	print("Nova vrednost", random_mail.get_property("value"))
+    # store mail for later 
 	access_info = {
 	  "mail": random_mail.get_property("value")
 	}
@@ -35,7 +34,6 @@ while i < 10:
 	voting_page = driver.window_handles[2]
 	driver.switch_to.window(voting_page)
 
-	print("naslov:", driver.title)
 	works = driver.find_elements_by_class_name("student-single-item-data")
 	# we need last(6th) work 
 	goal_work = works[5]
@@ -46,7 +44,9 @@ while i < 10:
 	link = form.find_element_by_tag_name("a")
 	link.click()
 
-	register_link = driver.find_element_by_id("nav").find_element_by_tag_name("a")
+	register_link = WebDriverWait(driver, 5).until(
+	        	EC.presence_of_element_located((By.CSS_SELECTOR, "p>a"))
+	    	)
 	register_link.click()
 
 	username_input = driver.find_element_by_id("user_login")
@@ -92,11 +92,9 @@ while i < 10:
 	with open("file.txt", "r", encoding="utf-8") as f:
 	    lines = f.read().splitlines()
 	    last_line = lines[-1]
-	    print(last_line)
 	    driver.execute_script('window.open("{last_line}","_blank").focus();'.format(last_line=last_line))
 
 	driver.switch_to.window(driver.window_handles[-1])
-	print(driver.title)
 
 	driver.execute_script("document.getElementById('pass1').dataset.pw = '';")
 	driver.find_element_by_id("pass1").send_keys(access_info["mail"])
@@ -122,8 +120,6 @@ while i < 10:
 
 	driver.execute_script('''window.open("https://www.evropskidnevnik.rs/multimedija-kategorija/page/2/","_blank").focus();''')
 	driver.switch_to.window(driver.window_handles[-1])
-
-	print(driver.title)
 
 	works = driver.find_elements_by_class_name("student-single-item-data")
 	# we need last(6th) work 
